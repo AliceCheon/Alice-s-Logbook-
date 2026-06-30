@@ -76,4 +76,44 @@ if(brandTitle&&!brandTitle.querySelector('.dumbbell-icon')){
   brandTitle.classList.add('brand-title');
   brandTitle.insertAdjacentHTML('afterbegin','<span class="dumbbell-icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><path d="M6 19h5v10H6a3 3 0 0 1-3-3v-4a3 3 0 0 1 3-3Zm36 0a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3h-5V19h5Z"/><path d="M13 15h6v18h-6a2 2 0 0 1-2-2V17a2 2 0 0 1 2-2Zm16 0h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6V15Z"/><path d="M18 21h12v6H18z"/></svg></span>');
 }
+function cleanSilhouetteSvg(kind){
+  const sparks='<span class="spark s1"></span><span class="spark s2"></span><span class="spark s3"></span>';
+  const svgs={
+    spalle:'<svg class="muscle-art" viewBox="0 0 140 160" aria-hidden="true"><circle class="sil-core" cx="70" cy="25" r="13"/><path class="sil-body" d="M49 45h42c9 17 9 47 0 87H49c-9-40-9-70 0-87z"/><path class="sil-focus" d="M23 69c9-17 24-27 43-27l4 18c-16 1-29 9-38 23L23 69zM117 69c-9-17-24-27-43-27l-4 18c16 1 29 9 38 23l9-14z"/><path class="sil-stroke" d="M40 83c9-14 20-21 30-21s21 7 30 21M70 45v84"/></svg>',
+    petto:'<svg class="muscle-art" viewBox="0 0 140 160" aria-hidden="true"><circle class="sil-core" cx="70" cy="25" r="13"/><path class="sil-body" d="M47 45h46c10 21 10 52 0 86H47c-10-34-10-65 0-86z"/><path class="sil-focus" d="M38 65c14-13 28-17 32-5 4-12 18-8 32 5 1 21-12 36-32 42-20-6-33-21-32-42z"/><path class="sil-stroke" d="M70 59v48M43 78c11 3 20 9 27 21M97 78c-11 3-20 9-27 21"/></svg>',
+    glutei:'<svg class="muscle-art" viewBox="0 0 140 160" aria-hidden="true"><path class="sil-body" d="M50 35h40c9 24 9 51 0 83H50c-9-32-9-59 0-83z"/><path class="sil-focus" d="M45 73c13 6 22 18 21 36-1 16-12 28-28 34-12-21-10-50 7-70zM95 73c-13 6-22 18-21 36 1 16 12 28 28 34 12-21 10-50-7-70z"/><path class="sil-stroke" d="M70 66v73M42 111c9 7 18 10 28 10M98 111c-9 7-18 10-28 10"/></svg>',
+    gambe:'<svg class="muscle-art" viewBox="0 0 140 160" aria-hidden="true"><path class="sil-body" d="M52 29h36l6 42 14 70H86L75 80H65l-11 61H32l14-70 6-42z"/><path class="sil-focus" d="M48 48h21l-6 47H38l10-47zM71 48h21l10 47H77l-6-47zM38 101h25l-6 40H31l7-40zM77 101h25l7 40H83l-6-40z"/><path class="sil-stroke" d="M58 48l-12 92M82 48l12 92M70 49v34"/></svg>',
+    dorsali:'<svg class="muscle-art" viewBox="0 0 140 160" aria-hidden="true"><circle class="sil-core" cx="70" cy="25" r="13"/><path class="sil-body" d="M49 45h42c9 18 9 50 0 88H49c-9-38-9-70 0-88z"/><path class="sil-focus" d="M50 49c-18 10-30 29-36 62 22 6 40-5 56-35 16 30 34 41 56 35-6-33-18-52-36-62-7 18-33 18-40 0z"/><path class="sil-stroke" d="M70 48v78M42 81c11 3 20 13 28 30M98 81c-11 3-20 13-28 30"/></svg>',
+    cardio:'<svg class="muscle-art" viewBox="0 0 140 160" aria-hidden="true"><path class="sil-soft" d="M43 36h54c14 24 15 56 0 94H43c-15-38-14-70 0-94z"/><path class="sil-focus" d="M70 125S31 101 31 68c0-15 10-27 25-27 8 0 13 4 14 9 1-5 6-9 14-9 15 0 25 12 25 27 0 33-39 57-39 57z"/><path class="sil-stroke" d="M22 83h25l10-18 15 38 12-26h34"/></svg>',
+    addome:'<svg class="muscle-art" viewBox="0 0 140 160" aria-hidden="true"><circle class="sil-core" cx="70" cy="25" r="13"/><path class="sil-body" d="M48 45h44c10 21 10 54 0 90H48c-10-36-10-69 0-90z"/><path class="sil-focus" d="M57 58h26c7 19 7 45 0 68H57c-7-23-7-49 0-68z"/><path class="sil-stroke" d="M70 59v66M56 75h28M55 92h30M57 109h26"/></svg>'
+  };
+  return (svgs[kind]||svgs.glutei)+sparks;
+}
+function cleanSilhouetteKind(text){
+  const s=String(text||'').toLowerCase();
+  if(s.includes('spalle')||s.includes('shoulder')||s.includes('alzate')||s.includes('military')||s.includes('face pull'))return'spalle';
+  if(s.includes('petto')||s.includes('chest')||s.includes('panca')||s.includes('push'))return'petto';
+  if(s.includes('glute')||s.includes('abductor')||s.includes('hip')||s.includes('slanci'))return'glutei';
+  if(s.includes('quad')||s.includes('femor')||s.includes('leg')||s.includes('pendulum')||s.includes('squat')||s.includes('calf')||s.includes('polpacci')||s.includes('hack')||s.includes('stacco'))return'gambe';
+  if(s.includes('dors')||s.includes('schiena')||s.includes('lat')||s.includes('pulley')||s.includes('row')||s.includes('trazioni')||s.includes('rematore'))return'dorsali';
+  if(s.includes('cardio')||s.includes('tapins')||s.includes('corsa')||s.includes('bike'))return'cardio';
+  if(s.includes('addom')||s.includes('crunch')||s.includes('abs')||s.includes('plank'))return'addome';
+  return'glutei';
+}
+function applyCleanSilhouettes(){
+  document.querySelectorAll('.exercise-visual:not(.silhouette-ready)').forEach(visual=>{
+    const card=visual.closest('.exercise-card');
+    const label=visual.querySelector('.visual-label')?.textContent?.trim()||'Workout';
+    const title=card?.querySelector('h3')?.textContent||'';
+    const kind=cleanSilhouetteKind(label+' '+title);
+    visual.className='exercise-visual visual-'+kind+' silhouette-ready';
+    visual.innerHTML=cleanSilhouetteSvg(kind)+'<span class="visual-label">'+label+'</span>';
+  });
+}
+const contentTarget=document.getElementById('content');
+if(contentTarget){
+  new MutationObserver(()=>applyCleanSilhouettes()).observe(contentTarget,{childList:true,subtree:true});
+  applyCleanSilhouettes();
+}
+document.getElementById('loadWorkout')?.addEventListener('click',()=>setTimeout(applyCleanSilhouettes,0));
 </script></body></html>
