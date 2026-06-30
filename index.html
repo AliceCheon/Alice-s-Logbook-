@@ -279,4 +279,81 @@ cleanSilhouetteSvg=finalAnatomySvg;
 applyFinalAnatomy();
 document.getElementById('loadWorkout')?.addEventListener('click',()=>setTimeout(applyFinalAnatomy,0));
 if(contentTarget)new MutationObserver(()=>setTimeout(applyFinalAnatomy,0)).observe(contentTarget,{childList:true,subtree:true});
+function historyExerciseNorm(value){
+  return String(value||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'');
+}
+function historyExerciseKey(exercise){
+  const n=historyExerciseNorm(exercise);
+  if(!n)return'';
+  if(n.includes('bulgar'))return'bulgaro';
+  if(n.includes('adductor')||n.includes('abductor'))return'adductorabductor';
+  if(n.includes('legcurl')&&n.includes('sing'))return'legcurlsingolo';
+  if(n.includes('legcurls')&&n.includes('sing'))return'legcurlsingolo';
+  if(n.includes('legcurl')||n.includes('legcurls'))return'legcurl';
+  if(n.includes('legextension')&&n.includes('sing'))return'legextensionsingola';
+  if(n.includes('legextension'))return'legextension';
+  if(n.includes('calf')||n.includes('polpacci'))return'calf';
+  if(n.includes('glutesmachine'))return'glutesmachine';
+  if(n.includes('hyperstension')||n.includes('hypersetension')||n.includes('hyperextension'))return'hyperstension';
+  if(n.includes('hiptrust')||n.includes('hipthrust')||n.includes('hipthurst'))return'hipthrust';
+  if(n.includes('triset'))return'trisetglutei';
+  if(n.includes('slanci')||n.includes('slancio'))return'slanci';
+  if(n.includes('affondo')||n.includes('affondi'))return'affondi';
+  if(n.includes('hack'))return'hacksquat';
+  if(n.includes('pendulum'))return'pendulum';
+  if(n.includes('military'))return'military';
+  if(n.includes('latmachinetriangolo')||n.includes('lattriangolo'))return'latmachinetriangolo';
+  if(n.includes('latlarga'))return'latlarga';
+  if(n.includes('latmachine'))return'latmachine';
+  if(n.includes('pulldownsbarra')||n.includes('pulldown')&&n.includes('sbarra'))return'pulldownsbarra';
+  if(n.includes('pulldowncorda')||n.includes('pulldown')||n.includes('pulldowncorda'))return'pulldown';
+  if(n.includes('pulley'))return'pulley';
+  if(n.includes('alzatelateralicavobasso'))return'alzatelateralicavobasso';
+  if(n.includes('alzatelateralimacchinario')||n.includes('alzlateralimacchinario'))return'alzatelateralimacchinario';
+  if(n.includes('alzateralipanca')||n.includes('alzlateralipanca'))return'alzateralipanca';
+  if(n.includes('alzateralisetuda')||n.includes('alzlateralisetuda')||n.includes('alzlateralisduta')||n.includes('alzlateralisduta'))return'alzlateralisduta';
+  if(n.includes('facepull'))return'facepull';
+  if(n.includes('curlsmartellopanca')||n==='curl'||n==='curls')return'curlsmartellopanca';
+  if(n.includes('cardiotapins')||n==='cardio')return'cardio';
+  if(n.includes('rowmachine'))return'rowmachine';
+  if(n.includes('lentoavanti'))return'lentoavanti';
+  if(n.includes('tricipiticavoaltoincorda'))return'pushdown';
+  if(n.includes('pushdown'))return'pushdown';
+  if(n.includes('pushup'))return'pushup';
+  if(n.includes('staccrdl')||n.includes('staccordl'))return'stacc_rdl';
+  if(n.includes('staccomonogamba')||n.includes('staccomono'))return'staccomonogamba';
+  if(n.includes('pressa45')||n.includes('pressamono')||n.includes('pressaverticale'))return'pressa';
+  return n;
+}
+function historySetsFilled(row){
+  return (row.sets||[]).some(s=>s!==''&&s!=null);
+}
+function historyFindForExercise(exercise, predicate){
+  const exact=historyExerciseNorm(exercise);
+  const key=historyExerciseKey(exercise);
+  const workoutRow=(currentWorkout||[]).find(r=>r.exercise===exercise);
+  const card=workoutRow?String(workoutRow.card||''):'';
+  const occurrence=workoutRow?(currentWorkout||[]).slice(0,(currentWorkout||[]).indexOf(workoutRow)).filter(r=>historyExerciseKey(r.exercise)===key).length:0;
+  const rows=(state.history||[]).map((r,i)=>({...r,_historyIndex:i}));
+  const sameCard=r=>!card||String(r.card||'')===card;
+  const pick=candidates=>{
+    if(!candidates.length)return null;
+    const latest=candidates[candidates.length-1];
+    const groupId=r=>[r.date||'',r.week||'',r.card||'',r.phaseId||r.phaseName||''].join('|');
+    const group=candidates.filter(r=>groupId(r)===groupId(latest));
+    return group[Math.min(occurrence,group.length-1)]||latest;
+  };
+  return pick(rows.filter(r=>sameCard(r)&&historyExerciseNorm(r.exercise)===exact&&predicate(r)))||
+    pick(rows.filter(r=>sameCard(r)&&historyExerciseKey(r.exercise)===key&&predicate(r)))||
+    pick(rows.filter(r=>historyExerciseNorm(r.exercise)===exact&&predicate(r)))||
+    pick(rows.filter(r=>historyExerciseKey(r.exercise)===key&&predicate(r)));
+}
+previousFor=function(exercise){
+  const r=historyFindForExercise(exercise,historySetsFilled);
+  return r?r.sets.map((s,i)=>s!==''&&s!=null?'S'+(i+1)+': '+fmt(s):'').filter(Boolean).join(' - '):'Primo allenamento';
+};
+reminderFor=function(exercise){
+  const r=historyFindForExercise(exercise,r=>String(r.userNote||'').trim());
+  return r?String(r.userNote).trim():'';
+};
 </script></body></html>
