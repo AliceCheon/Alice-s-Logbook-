@@ -194,4 +194,89 @@ silhouetteSvg=anatomyFigureSvg;
 visualArt=(muscle,exercise)=>anatomyFigureSvg(anatomyKind(muscle+' '+exercise));
 document.querySelectorAll('.exercise-visual.silhouette-ready').forEach(v=>v.classList.remove('silhouette-ready'));
 applyCleanSilhouettes();
+function finalMuscleKind(text){
+  const s=String(text||'').toLowerCase();
+  if(s.includes('tricip'))return'tricipiti';
+  if(s.includes('femor')||s.includes('leg_curl')||s.includes('leg curl')||s.includes('leg_curls')||s.includes('stacco')||s.includes('rdl'))return'femorali';
+  if(s.includes('bicip')||s.includes('curl'))return'bicipiti';
+  if(s.includes('pendulum')||s.includes('quad')||s.includes('leg_extension')||s.includes('leg extension')||s.includes('hack')||s.includes('squat')||s.includes('adductor'))return'quadricipiti';
+  if(s.includes('polpacci')||s.includes('calf'))return'polpacci';
+  if(s.includes('glute')||s.includes('abductor')||s.includes('hip')||s.includes('slanci'))return'glutei';
+  if(s.includes('spalle')||s.includes('shoulder')||s.includes('alzate')||s.includes('military')||s.includes('face_pull')||s.includes('face pull')||s.includes('lento'))return'spalle';
+  if(s.includes('petto')||s.includes('chest')||s.includes('panca')||s.includes('push_up')||s.includes('push up'))return'petto';
+  if(s.includes('dors')||s.includes('schiena')||s.includes('lat')||s.includes('pulley')||s.includes('row')||s.includes('trazioni')||s.includes('rematore')||s.includes('pull_down')||s.includes('pull down'))return'dorsali';
+  if(s.includes('addom')||s.includes('crunch')||s.includes('abs')||s.includes('plank'))return'addome';
+  if(s.includes('cardio')||s.includes('tapins')||s.includes('corsa')||s.includes('bike'))return'cardio';
+  return'fullbody';
+}
+function finalMuscleLabel(kind, fallback){
+  return ({
+    bicipiti:'Bicipiti', tricipiti:'Tricipiti', quadricipiti:'Quadricipiti',
+    femorali:'Femorali', polpacci:'Polpacci', glutei:'Glutei',
+    spalle:'Spalle', petto:'Petto', dorsali:'Dorsali',
+    addome:'Addominali', cardio:'Cardio', fullbody:fallback||'Workout'
+  })[kind] || fallback || 'Workout';
+}
+function finalAnatomySvg(kind){
+  const pink='#f33f99', pinkDark='#c92a7e', pale='rgba(255,255,255,.24)', white='rgba(255,255,255,.96)';
+  const back=['tricipiti','dorsali','glutei','femorali','polpacci'].includes(kind);
+  const base='<g fill="'+pale+'" stroke="'+white+'" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">'+
+    '<path d="M58 18c6-8 22-8 28 0 5 8 3 23-14 23S53 26 58 18z"/>'+
+    '<path d="M51 44h42l8 12 16 10-7 21-11-7-3 36 9 47H86l-8-43-6-9-6 9-8 43H39l9-47-3-36-11 7-7-21 16-10 8-12z"/>'+
+    '<path d="M43 59 30 98l12 6 12-31M101 59l13 39-12 6-12-31"/>'+
+    '</g>';
+  const frontLines='<g fill="none" stroke="rgba(255,255,255,.70)" stroke-width="1.8" stroke-linecap="round">'+
+    '<path d="M72 45v68M56 62c9 5 23 5 32 0M60 77h24M59 91h26M61 105h22M52 119l-7 39M92 119l7 39"/>'+
+    '</g>';
+  const backLines='<g fill="none" stroke="rgba(255,255,255,.70)" stroke-width="1.8" stroke-linecap="round">'+
+    '<path d="M72 45v68M55 65c10 6 24 6 34 0M53 91c12 5 26 5 38 0M52 119l-7 39M92 119l7 39"/>'+
+    '</g>';
+  const focus={
+    bicipiti:'<path d="M38 61c8-2 15 5 15 16 0 9-4 22-10 30-5 6-16 1-14-7l7-27c1-5 1-9 2-12zM106 61c-8-2-15 5-15 16 0 9 4 22 10 30 5 6 16 1 14-7l-7-27c-1-5-1-9-2-12z"/>',
+    tricipiti:'<path d="M36 61c9 1 15 10 14 22-1 9-5 20-10 27-6 6-17 1-14-8l8-30c1-5 1-8 2-11zM108 61c-9 1-15 10-14 22 1 9 5 20 10 27 6 6 17 1 14-8l-8-30c-1-5-1-8-2-11z"/>',
+    spalle:'<path d="M43 48c10-8 20-9 29-4 9-5 19-4 29 4l-7 20c-8-7-15-10-22-10s-14 3-22 10l-7-20z"/>',
+    petto:'<path d="M49 58c11-11 20-12 23-3 3-9 12-8 23 3 0 17-9 29-23 34-14-5-23-17-23-34z"/>',
+    dorsali:'<path d="M50 49c-17 10-30 29-37 60 24 7 43-7 59-38 16 31 35 45 59 38-7-31-20-50-37-60-7 19-37 19-44 0z"/>',
+    addome:'<path d="M60 58h24c7 20 7 44 0 65H60c-7-21-7-45 0-65z"/>',
+    glutei:'<path d="M49 103c13 5 21 15 20 30-1 13-11 23-27 28-10-20-8-43 7-58zM95 103c-13 5-21 15-20 30 1 13 11 23 27 28 10-20 8-43-7-58z"/>',
+    quadricipiti:'<path d="M50 116h19l-8 47H39l11-47zM75 116h19l11 47H83l-8-47z"/>',
+    femorali:'<path d="M51 116h18l-7 47H40l11-47zM75 116h18l11 47H82l-7-47z"/>',
+    polpacci:'<path d="M43 139h19l-3 26H37l6-26zM82 139h19l6 26H85l-3-26z"/>',
+    cardio:'<path d="M72 100S46 83 46 62c0-11 7-19 17-19 5 0 8 3 9 7 1-4 4-7 9-7 10 0 17 8 17 19 0 21-26 38-26 38z"/>',
+    fullbody:'<path d="M51 44h42l8 12 16 10-7 21-11-7-3 36 9 47H86l-8-43-6-9-6 9-8 43H39l9-47-3-36-11 7-7-21 16-10 8-12z" opacity=".55"/>'
+  };
+  const details = kind==='addome' ? '<path d="M72 59v62M60 74h24M59 90h26M61 106h22" fill="none" stroke="'+white+'" stroke-width="1.8" stroke-linecap="round"/>' : '';
+  const pulse = kind==='cardio' ? '<path d="M39 74h20l7-13 10 29 9-20h22" fill="none" stroke="'+white+'" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>' : '';
+  return '<svg class="muscle-art final-anatomy '+(back?'back':'front')+'" viewBox="0 0 144 180" aria-hidden="true">'+
+    base+
+    '<g fill="'+pink+'" stroke="'+white+'" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">'+(focus[kind]||focus.fullbody)+'</g>'+
+    (back?backLines:frontLines)+details+pulse+
+    '<g fill="'+pinkDark+'" opacity=".35"><circle cx="72" cy="20" r="9"/></g>'+
+    '</svg><span class="spark s1"></span><span class="spark s2"></span><span class="spark s3"></span>';
+}
+function applyFinalAnatomy(){
+  document.querySelectorAll('.exercise-card').forEach(card=>{
+    const visual=card.querySelector('.exercise-visual');
+    if(!visual)return;
+    const title=card.querySelector('h3')?.textContent||'';
+    const pill=card.querySelector('.pill.blue')?.textContent||'';
+    const oldLabel=visual.querySelector('.visual-label')?.textContent||pill||'Workout';
+    const kind=finalMuscleKind(pill+' '+title+' '+oldLabel);
+    const label=finalMuscleLabel(kind, oldLabel);
+    if(visual.dataset.finalKind===kind && visual.classList.contains('final-ready'))return;
+    visual.dataset.finalKind=kind;
+    visual.className='exercise-visual visual-'+kind+' silhouette-ready final-ready';
+    visual.innerHTML=finalAnatomySvg(kind)+'<span class="visual-label">'+esc(label)+'</span>';
+    const pillEl=card.querySelector('.pill.blue');
+    if(pillEl)pillEl.textContent=label;
+  });
+}
+visualKind=(muscle,exercise)=>finalMuscleKind(muscle+' '+exercise);
+visualClass=(muscle,exercise)=>'visual-'+finalMuscleKind(muscle+' '+exercise);
+visualArt=(muscle,exercise)=>finalAnatomySvg(finalMuscleKind(muscle+' '+exercise));
+cleanSilhouetteKind=finalMuscleKind;
+cleanSilhouetteSvg=finalAnatomySvg;
+applyFinalAnatomy();
+document.getElementById('loadWorkout')?.addEventListener('click',()=>setTimeout(applyFinalAnatomy,0));
+if(contentTarget)new MutationObserver(()=>setTimeout(applyFinalAnatomy,0)).observe(contentTarget,{childList:true,subtree:true});
 </script></body></html>
